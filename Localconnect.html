@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalConnect App | Ipeleng Difero</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #080c10;
+            --surface: #0e1419;
+            --surface2: #141c24;
+            --border: rgba(255,255,255,0.07);
+            --text: #e8edf2;
+            --muted: #7a8a9a;
+            --accent: #00d4ff;
+            --green: #00e5a0;
+            --glow: rgba(0, 212, 255, 0.12);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg); color: var(--text);
+            overflow-x: hidden; cursor: none;
+        }
+        .cursor { width: 12px; height: 12px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; transition: transform 0.1s; mix-blend-mode: difference; }
+        .cursor-trail { width: 32px; height: 32px; border: 1px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transition: left 0.12s ease, top 0.12s ease; opacity: 0.4; }
+
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 60px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(8,12,16,0.85); backdrop-filter: blur(20px);
+        }
+        .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; letter-spacing: 0.15em; color: var(--accent); text-decoration: none; }
+        .nav-back { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 8px; transition: color 0.2s; }
+        .nav-back:hover { color: var(--accent); }
+
+        /* HERO */
+        .project-hero {
+            min-height: 100vh;
+            display: grid; grid-template-columns: 1fr 1fr;
+            align-items: center;
+            padding: 120px 60px 80px;
+            gap: 80px;
+            position: relative; overflow: hidden;
+        }
+        .hero-bg {
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse 60% 60% at 70% 50%, rgba(0,212,255,0.06), transparent 70%),
+                        radial-gradient(ellipse 40% 40% at 30% 80%, rgba(0,229,160,0.05), transparent 70%);
+        }
+        .grid-bg {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(0,212,255,0.025) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0,212,255,0.025) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(ellipse 70% 70% at 70% 50%, black, transparent);
+        }
+
+        .hero-content { position: relative; z-index: 1; }
+        .back-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: 'DM Mono', monospace; font-size: 0.65rem;
+            letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--muted); text-decoration: none;
+            margin-bottom: 32px; transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--accent); }
+
+        .project-label {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: 'DM Mono', monospace; font-size: 0.65rem;
+            letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--green); background: rgba(0,229,160,0.08);
+            border: 1px solid rgba(0,229,160,0.2); padding: 5px 14px;
+            border-radius: 2px; margin-bottom: 24px;
+        }
+        .project-label::before { content: '●'; font-size: 0.5rem; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        .project-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 800; line-height: 0.95;
+            letter-spacing: -0.02em; margin-bottom: 24px;
+        }
+        .project-title .accent { color: var(--accent); }
+        .project-title .outline {
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255,255,255,0.2);
+        }
+
+        .project-tagline {
+            font-size: 1rem; color: var(--muted); line-height: 1.7;
+            margin-bottom: 40px; max-width: 480px;
+        }
+
+        .tech-stack { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; }
+        .tech-pill {
+            font-family: 'DM Mono', monospace; font-size: 0.65rem;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--accent); border: 1px solid rgba(0,212,255,0.25);
+            background: rgba(0,212,255,0.06); padding: 6px 14px; border-radius: 2px;
+        }
+
+        .hero-meta { display: flex; gap: 32px; }
+        .meta-item {}
+        .meta-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+        .meta-value { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; }
+
+        /* PHONE MOCKUP */
+        .phone-showcase {
+            position: relative; z-index: 1;
+            display: flex; justify-content: center; align-items: center;
+            gap: 24px;
+        }
+        .phone-frame {
+            width: 220px;
+            background: #0a0f14;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 36px;
+            overflow: hidden;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05), inset 0 0 30px rgba(0,0,0,0.3);
+            flex-shrink: 0;
+        }
+        .phone-frame.main { height: 440px; }
+        .phone-frame.secondary { width: 180px; height: 360px; opacity: 0.6; transform: translateY(30px) translateX(-20px) scale(0.92); }
+
+        .phone-notch {
+            height: 28px; background: #0a0f14;
+            display: flex; justify-content: center; align-items: center;
+            position: relative;
+        }
+        .notch-pill {
+            width: 80px; height: 10px; background: #000;
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* Screen 1: Login */
+        .screen-login {
+            background: linear-gradient(180deg, #10b981 0%, #0284c7 100%);
+            height: 100%; display: flex; flex-direction: column;
+            align-items: center; padding: 20px 16px; position: relative;
+        }
+        .screen-time { font-size: 0.55rem; color: #fff; margin-bottom: 20px; letter-spacing: 0.1em; }
+        .app-name { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: #fff; text-align: center; margin-bottom: 2px; }
+        .screen-sub { font-size: 0.45rem; color: rgba(255,255,255,0.8); margin-bottom: 20px; text-align: center; }
+        
+        .login-card {
+            background: #fff; width: 100%; border-radius: 12px; padding: 16px 12px;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .screen-heading { font-family: 'Syne', sans-serif; font-size: 0.85rem; font-weight: 700; color: #000; text-align: center; margin-bottom: 8px; }
+        .mock-input {
+            width: 100%; height: 28px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px; 
+            display: flex; align-items: center; padding: 0 10px; gap: 6px;
+        }
+        .mock-input i { font-size: 0.55rem; color: #9ca3af; }
+        .mock-input-text { font-size: 0.45rem; color: #9ca3af; }
+        .mock-btn {
+            width: 100%; height: 28px;
+            background: #2563eb;
+            border-radius: 6px; margin-top: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.5rem; font-weight: 600; color: #fff;
+        }
+        .mock-link { font-size: 0.4rem; color: #2563eb; text-align: center; margin-top: 4px; }
+
+        /* Screen 2: Dashboard */
+        .screen-dashboard {
+            background: #f9fafb;
+            height: 100%; padding: 0;
+            display: flex; flex-direction: column;
+        }
+        .dash-top { background: #06b6d4; padding: 12px 14px 24px; border-radius: 0 0 16px 16px; }
+        .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .dash-greeting { font-size: 0.6rem; font-weight: 700; color: #fff; }
+        .balance-card {
+            background: linear-gradient(135deg, #10b981, #0284c7);
+            border-radius: 10px; padding: 14px 12px; color: #fff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .balance-label { font-size: 0.42rem; color: rgba(255,255,255,0.8); text-align: center; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; gap: 4px;}
+        .balance-amount { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; }
+        
+        .dash-body { padding: 16px 14px; flex: 1; }
+        .dash-section-title { font-size: 0.55rem; font-weight: 700; color: #1f2937; margin-bottom: 8px; }
+        .quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+        .qa-btn {
+            border-radius: 8px; padding: 16px 8px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+            color: #fff; font-weight: 600; font-size: 0.45rem; text-align: center;
+        }
+        .qa-btn.blue { background: #3b82f6; }
+        .qa-btn.green { background: #10b981; }
+        .qa-btn.cyan { background: #06b6d4; }
+        .qa-btn.light-green { background: #86efac; color: #065f46; }
+        .qa-icon { font-size: 0.9rem; }
+
+        /* CONTENT SECTIONS */
+        .content { max-width: 1100px; margin: 0 auto; padding: 0 60px; }
+
+        .section { padding: 80px 0; border-top: 1px solid var(--border); }
+        .section-tag {
+            font-family: 'DM Mono', monospace; font-size: 0.65rem;
+            letter-spacing: 0.2em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: 12px; display: block;
+        }
+        .section-title {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(1.5rem, 3vw, 2.2rem);
+            font-weight: 800; margin-bottom: 32px;
+        }
+
+        /* Overview */
+        .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; }
+        .overview-text { font-size: 0.95rem; color: var(--muted); line-height: 1.8; }
+        .overview-text strong { color: var(--text); }
+        .overview-text p + p { margin-top: 16px; }
+
+        /* Features */
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+        .feature-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 32px 28px;
+            transition: all 0.3s;
+            position: relative; overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--green));
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .feature-card:hover { transform: translateY(-4px); }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-icon { font-size: 1.5rem; margin-bottom: 16px; }
+        .feature-title { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 8px; }
+        .feature-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+        /* Tech Stack detail */
+        .tech-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+        .tech-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 24px 20px;
+            border-radius: 4px; text-align: center;
+            transition: all 0.3s;
+        }
+        .tech-card:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-3px); }
+        .tech-card i { font-size: 1.8rem; color: var(--accent); margin-bottom: 10px; display: block; }
+        .tech-name { font-family: 'Syne', sans-serif; font-size: 0.8rem; font-weight: 700; }
+        .tech-role { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--muted); margin-top: 4px; }
+
+        /* Testing List */
+        .security-list { display: flex; flex-direction: column; gap: 16px; }
+        .security-item {
+            display: flex; align-items: flex-start; gap: 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 20px 24px; border-radius: 4px;
+            transition: border-color 0.2s;
+        }
+        .security-item:hover { border-color: rgba(0,229,160,0.25); }
+        .security-check { color: var(--green); font-size: 1rem; flex-shrink: 0; margin-top: 2px; }
+        .security-content {}
+        .security-title { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; margin-bottom: 4px; }
+        .security-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.5; }
+
+        /* Gallery Grid */
+        .gallery-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 24px;
+        }
+        .gallery-item {
+            background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+            transition: transform 0.2s;
+        }
+        .gallery-item:hover { transform: translateY(-4px); border-color: var(--accent); }
+        .gallery-item img {
+            width: 100%; height: 200px; object-fit: cover; object-position: top;
+            border-bottom: 1px solid var(--border); background: #000;
+        }
+        .gallery-caption {
+            padding: 14px 16px; font-family: 'DM Mono', monospace; font-size: 0.75rem; color: var(--text); text-align: center;
+        }
+
+        /* CTA */
+        .cta-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 60px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 40px; margin: 80px 0;
+            border-radius: 4px; position: relative; overflow: hidden;
+        }
+        .cta-bar::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 2px; background: linear-gradient(90deg, var(--accent), var(--green));
+        }
+        .cta-title { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; }
+        .cta-sub { font-size: 0.9rem; color: var(--muted); margin-top: 8px; }
+        .btn-primary {
+            font-family: 'DM Mono', monospace; font-size: 0.75rem;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            color: var(--bg); background: var(--accent);
+            padding: 14px 32px; text-decoration: none; border-radius: 2px;
+            transition: all 0.2s; white-space: nowrap;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary:hover { background: white; transform: translateY(-2px); }
+        .btn-outline {
+            font-family: 'DM Mono', monospace; font-size: 0.75rem;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            color: var(--text); border: 1px solid var(--border);
+            padding: 14px 32px; text-decoration: none; border-radius: 2px;
+            transition: all 0.2s; white-space: nowrap;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+        footer {
+            border-top: 1px solid var(--border);
+            background: var(--surface);
+            padding: 40px 60px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .footer-brand { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800; color: var(--accent); }
+        .footer-copy { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; color: var(--muted); }
+
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16,1,0.3,1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+
+        @media (max-width: 768px) {
+            .cursor, .cursor-trail { display: none; }
+            body { cursor: auto; }
+            nav { padding: 14px 20px; }
+            .project-hero {
+                grid-template-columns: 1fr;
+                padding: 90px 20px 40px;
+                gap: 40px;
+                min-height: auto;
+            }
+            .phone-showcase {
+                transform: scale(0.78);
+                transform-origin: top center;
+                margin-bottom: -40px;
+            }
+            .hero-meta { flex-wrap: wrap; gap: 16px; }
+            .content { padding: 0 20px; }
+            .section { padding: 56px 0; }
+            .overview-grid { grid-template-columns: 1fr; gap: 24px; }
+            .features-grid { grid-template-columns: 1fr; gap: 2px; }
+            .tech-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .gallery-grid { grid-template-columns: 1fr; gap: 16px; }
+            .cta-bar { flex-direction: column; padding: 32px 20px; text-align: center; gap: 24px; }
+            .cta-title { font-size: 1.4rem; }
+            footer { flex-direction: column; gap: 12px; text-align: center; padding: 32px 20px; }
+        }
+
+        @media (max-width: 400px) {
+            .phone-showcase { transform: scale(0.65); transform-origin: top center; margin-bottom: -70px; }
+            .tech-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-trail" id="cursorTrail"></div>
+
+    <nav>
+        <a href="index.html" class="nav-logo">ID.DEV</a>
+        <a href="index.html" class="nav-back"><i class="fas fa-arrow-left"></i> Back to Portfolio</a>
+    </nav>
+
+    <div class="project-hero">
+        <div class="hero-bg"></div>
+        <div class="grid-bg"></div>
+
+        <div class="hero-content">
+            <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> All Projects</a>
+            <div class="project-label">Android Application</div>
+            <h1 class="project-title">
+                LOCALCONNECT<br>
+                <span class="accent">SEAMLESS</span><br>
+                <span class="outline">PAYMENTS</span>
+            </h1>
+            <p class="project-tagline">
+                A seamless local payment application featuring role-based dashboards (Customer, Seller, Admin), 
+                secure Firebase authentication, dynamic QR code payments, and real-time transaction history.
+            </p>
+            <div class="tech-stack">
+                <span class="tech-pill">Java</span>
+                <span class="tech-pill">Android Studio</span>
+                <span class="tech-pill">Firebase Auth</span>
+                <span class="tech-pill">Cloud Firestore</span>
+                <span class="tech-pill">QR Integration</span>
+                <span class="tech-pill">XML Layouts</span>
+            </div>
+            <div class="hero-meta">
+                <div class="meta-item">
+                    <div class="meta-label">Platform</div>
+                    <div class="meta-value">Android (API 36)</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Module</div>
+                    <div class="meta-value">ITMDA3-B12</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Testing Result</div>
+                    <div class="meta-value">100% Pass Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="phone-showcase">
+            <div class="phone-frame secondary">
+                <div class="phone-notch"><div class="notch-pill"></div></div>
+                <div class="screen-login">
+                    <div class="screen-time">09:41</div>
+                    <div class="app-name">LocalConnect</div>
+                    <div class="screen-sub">Seamless Local Payments</div>
+                    
+                    <div class="login-card">
+                        <div class="screen-heading">Login</div>
+                        <div class="mock-input" style="width: 50%; height: 20px; font-size: 0.35rem; justify-content: center; background: #f3f4f6; color: #000; border-radius: 4px; margin: 0 auto 8px;">
+                            English (en) &nbsp; <span style="color:#2563eb; font-weight: bold;">Apply</span>
+                        </div>
+                        <div class="mock-input">
+                            <i class="fas fa-envelope"></i>
+                            <span class="mock-input-text">Email Address</span>
+                        </div>
+                        <div class="mock-input">
+                            <i class="fas fa-lock"></i>
+                            <span class="mock-input-text">••••••••</span>
+                        </div>
+                        <div class="mock-link" style="text-align: right; margin-bottom: 4px;">Forgot Password?</div>
+                        <div class="mock-btn">Login</div>
+                        <div class="mock-link" style="color: #6b7280;">Don't have an account? <span style="color:#2563eb; font-weight: bold;">Register</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="phone-frame main">
+                <div class="phone-notch"><div class="notch-pill"></div></div>
+                <div class="screen-dashboard">
+                    <div class="dash-top">
+                        <div class="dash-header">
+                            <span style="font-size: 0.45rem; background: #fff; color: #000; padding: 4px 8px; border-radius: 4px;">English (en)</span>
+                            <span style="font-size: 0.45rem; background: #2563eb; color: #fff; padding: 4px 8px; border-radius: 4px;">Apply</span>
+                        </div>
+                        <div class="dash-greeting">Welcome, Unathi</div>
+                    </div>
+                    
+                    <div class="dash-body">
+                        <div class="balance-card">
+                            <div class="balance-label"><i class="fas fa-info-circle"></i> Available Balance</div>
+                            <div class="balance-amount">Balance:<br>20000.00</div>
+                        </div>
+                        
+                        <div class="dash-section-title" style="margin-top: 16px;">Quick Actions</div>
+                        <div class="quick-actions">
+                            <div class="qa-btn blue">
+                                <i class="fas fa-phone-alt qa-icon"></i>
+                                <span>Pay by phone</span>
+                            </div>
+                            <div class="qa-btn green">
+                                <i class="fas fa-camera qa-icon"></i>
+                                <span>Scan QR</span>
+                            </div>
+                            <div class="qa-btn cyan">
+                                <i class="fas fa-clock qa-icon"></i>
+                                <span>View Transactions</span>
+                            </div>
+                            <div class="qa-btn light-green">
+                                <i class="fas fa-pen qa-icon"></i>
+                                <span>Update Profile</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+
+        <div class="section reveal">
+            <span class="section-tag">// Case Study</span>
+            <h2 class="section-title">LocalConnect: Financial <br>Inclusion & Digital Payments</h2>
+            <div class="overview-grid">
+                <div class="overview-text">
+                    <p>
+                        <strong>1. The Problem:</strong> Many users in informal economies lack access to streamlined digital banking tools, leading to security risks with cash and difficulty tracking financial growth. There is a critical need for a secure, localized system that bridges the gap between traditional transactions and modern fintech.
+                    </p>
+                    <p>
+                        <strong>2. My Role & Process:</strong> Working as part of a development team, I contributed to the full-stack architecture and testing. We utilized an Agile framework to ensure modularity, performing rigorous unit and edge-case testing from QR code payload validation to secure password reset workflows ensuring a 100% pass rate on core functional modules.
+                    </p>
+                    <p>
+                        <strong>3. Core Innovation:</strong> The platform features a <strong>unified transaction system</strong> where users can manage balances, pay via QR codes, and view real-time history. It was designed specifically to handle edge cases like network disruptions without compromising data integrity.
+                    </p>
+                </div>
+                <div class="overview-text">
+                    <p>
+                        <strong>4. Tech Implementation:</strong> The app is built on a robust backend designed for stability and deployment. Key technical features include role-based dashboards (Admin, Seller, Customer), real-time balance updates, and secure authentication layers to protect user financial data.
+                    </p>
+                    <p>
+                        <strong>5. The Result:</strong> The testing phase validated that LocalConnect meets all functional and non-functional requirements. The application provides a stable, dependable environment for digital payments, helping users build a verified transaction history and fostering financial inclusion within their local communities.
+                    </p>
+                    <p>
+                        <em style="color: var(--green);">Ultimately, LocalConnect provides a secure digital bridge, transforming how community members manage their money and access financial opportunities.</em>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section reveal">
+            <span class="section-tag">// Capabilities</span>
+            <h2 class="section-title">Key Features Validated</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <div class="feature-title">Role-Based Dashboards</div>
+                    <div class="feature-desc">Dynamic routing logs users into dedicated Customer, Seller, or Admin dashboards based on their assigned Firestore role.</div>
+                </div>
+                <div class="feature-card reveal-delay-1">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-title">QR Code Payments</div>
+                    <div class="feature-desc">Sellers can display unique QR codes with embedded payloads, allowing customers to easily scan and transfer funds seamlessly.</div>
+                </div>
+                <div class="feature-card reveal-delay-2">
+                    <div class="feature-icon">👥</div>
+                    <div class="feature-title">Admin Management</div>
+                    <div class="feature-desc">Admins have CRUD capabilities to search users, securely update account balances, delete users, and view system transactions.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📋</div>
+                    <div class="feature-title">Transaction Ledger</div>
+                    <div class="feature-desc">Every successful payment is written to a Firestore 'transactions' collection, serving as an immutable ledger with timestamps.</div>
+                </div>
+                <div class="feature-card reveal-delay-1">
+                    <div class="feature-icon">🌐</div>
+                    <div class="feature-title">Localization Support</div>
+                    <div class="feature-desc">Built-in language switching capability enabling users to navigate the app in English, Zulu, or Xhosa.</div>
+                </div>
+                <div class="feature-card reveal-delay-2">
+                    <div class="feature-icon">🔌</div>
+                    <div class="feature-title">Network Handling</div>
+                    <div class="feature-desc">Custom NetworkUtils class detects offline states, safely preventing app crashes and guiding the user with Toast notifications.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section reveal">
+            <span class="section-tag">// Technology</span>
+            <h2 class="section-title">Tech Stack</h2>
+            <div class="tech-grid">
+                <div class="tech-card">
+                    <i class="fab fa-java"></i>
+                    <div class="tech-name">Java</div>
+                    <div class="tech-role">Core Language</div>
+                </div>
+                <div class="tech-card">
+                    <i class="fab fa-android"></i>
+                    <div class="tech-name">Android Studio</div>
+                    <div class="tech-role">IDE & XML Layouts</div>
+                </div>
+                <div class="tech-card">
+                    <i class="fas fa-fire"></i>
+                    <div class="tech-name">Firebase Auth</div>
+                    <div class="tech-role">Authentication</div>
+                </div>
+                <div class="tech-card">
+                    <i class="fas fa-database"></i>
+                    <div class="tech-name">Cloud Firestore</div>
+                    <div class="tech-role">NoSQL Database</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section reveal">
+            <span class="section-tag">// QA & Testing</span>
+            <h2 class="section-title">Testing & Reliability</h2>
+            <div class="security-list">
+                <div class="security-item">
+                    <i class="fas fa-check-circle security-check"></i>
+                    <div class="security-content">
+                        <div class="security-title">Functional & Edge-Case Testing</div>
+                        <div class="security-desc">We successfully tested all edge cases, including handling blank registration fields, duplicate email checking, and incorrect login formats. The app handles all errors gracefully with unified feedback messages instead of crashing.</div>
+                    </div>
+                </div>
+                <div class="security-item">
+                    <i class="fas fa-check-circle security-check"></i>
+                    <div class="security-content">
+                        <div class="security-title">Usability & UI Verification</div>
+                        <div class="security-desc">The UI was tested for responsiveness across screen sizes. The combination of card-based layouts and intuitive navigation flow proved to be highly accessible during user testing.</div>
+                    </div>
+                </div>
+                <div class="security-item">
+                    <i class="fas fa-check-circle security-check"></i>
+                    <div class="security-content">
+                        <div class="security-title">Bug Tracking & Resolution</div>
+                        <div class="security-desc">Issues discovered during testing were actively resolved. For example, a confusing long-press deletion interaction on the Admin screen was replaced with an intuitive dialog offering clear actions (Update Balance / Delete User).</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section reveal">
+            <span class="section-tag">// Deliverables</span>
+            <h2 class="section-title">Testing Screenshots</h2>
+            <p style="color: var(--muted); font-size: 0.9rem; margin-bottom: 24px;">Visual proof of successful test execution and database structure across emulator and physical devices.</p>
+            
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <img src="images/Picture1.jpg" alt="Registration Screen">
+                    <div class="gallery-caption">Registration & Validation</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/Picture3.png" alt="Customer Dashboard">
+                    <div class="gallery-caption">Customer Dashboard</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/Picture6.jpg" alt="Seller QR Display">
+                    <div class="gallery-caption">Seller QR Code Display</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/Picture15.jpg" alt="Admin Updating Balance">
+                    <div class="gallery-caption">Admin Balance Update</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/Picture11.png" alt="Transaction History">
+                    <div class="gallery-caption">Transaction Ledger</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/Picture12.png" alt="Edge Case Handled">
+                    <div class="gallery-caption">Offline/Error Handling</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/Picture14.png" alt="Firestore Users Collection">
+                    <div class="gallery-caption">Firestore Users DB</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="images/Picture13.png" alt="Firestore Transactions Collection">
+                    <div class="gallery-caption">Firestore Transactions DB</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta-bar reveal">
+            <div>
+                <div class="cta-title">Want to see more of my work?</div>
+                <div class="cta-sub">Check out my other projects or get in touch to discuss opportunities.</div>
+            </div>
+            <div style="display:flex; gap:16px; flex-wrap:wrap;">
+
+                <a href="mailto:deedifero@gmail.com" class="btn-outline"><i class="fas fa-envelope"></i> Contact Me</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-brand">ID.DEV</div>
+        <div class="footer-copy">© 2026 Ipeleng Difero</div>
+    </footer>
+
+    <script>
+        const cursor = document.getElementById('cursor');
+        const trail = document.getElementById('cursorTrail');
+        document.addEventListener('mousemove', e => {
+            cursor.style.left = e.clientX - 6 + 'px';
+            cursor.style.top = e.clientY - 6 + 'px';
+            trail.style.left = e.clientX - 16 + 'px';
+            trail.style.top = e.clientY - 16 + 'px';
+        });
+
+        function reveal() {
+            document.querySelectorAll('.reveal').forEach(el => {
+                if (el.getBoundingClientRect().top < window.innerHeight - 100) {
+                    el.classList.add('active');
+                }
+            });
+        }
+        window.addEventListener('scroll', reveal);
+        reveal();
+    </script>
+</body>
+</html>
